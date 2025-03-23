@@ -1,30 +1,32 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from './screens/Home';
-import Forms from './screens/Forms';
-import { RootStackParamList } from './screens/types';
-import About from './screens/About';
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import React, { useState } from "react";
+import { View, Text, Button, StyleSheet } from "react-native";
+import Test from "./components/Test";
 
 export default function App() {
+  const [quizStarted, setQuizStarted] = useState(false);
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={Home}
-        />
-        <Stack.Screen
-          name="Forms"
-          component={Forms}
-          options={{ title: 'Create Product' }}
-        />
-        <Stack.Screen
-          name="About"
-          component={About}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      {quizStarted ? (
+        <Test onQuizEnd={() => setQuizStarted(false)} />
+      ) : (
+        <>
+          <Text style={styles.title}>Тест на темперамент</Text>
+          <Button title="Старт" onPress={() => setQuizStarted(true)} />
+        </>
+      )}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+});
