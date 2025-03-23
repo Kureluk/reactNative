@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import Test from "./components/Test";
+import TodoList from "./components/TodoList";
 
 export default function App() {
-  const [quizStarted, setQuizStarted] = useState(false);
+
 
   return (
     <View style={styles.container}>
-      {quizStarted ? (
-        <Test onQuizEnd={() => setQuizStarted(false)} />
-      ) : (
-        <>
-          <Text style={styles.title}>Тест на темперамент</Text>
-          <Button title="Старт" onPress={() => setQuizStarted(true)} />
-        </>
-      )}
+      <TodoList/>
     </View>
   );
 }
