@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import axios from "axios";
+import AddTodoForm from "./AddTodoForm";
+import { NewTodo } from "../models/task";
 
 interface Todo {
   id: number;
@@ -9,9 +11,10 @@ interface Todo {
   userId: number;
 }
 
-export default function TodoList() {
+const TodoList: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     axios.get<{ todos: Todo[] }>("https://dummyjson.com/todos")
@@ -26,6 +29,18 @@ export default function TodoList() {
       });
   }, []);
 
+  const handleAddTodo = (data: NewTodo) => {
+    const newTodo = {
+      id: Math.max(0, ...todos.map(t => t.id)) + 1,
+      todo: data.title,
+      completed: data.status === "done",
+      userId: 1
+    };
+    
+    setTodos([newTodo, ...todos]);
+    Alert.alert("Success", "Task added successfully!");
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
   }
@@ -38,6 +53,21 @@ export default function TodoList() {
         <Text style={styles.headerText}>To do list</Text>
         <Text style={styles.dateText}>{currentDate}</Text>
       </View>
+      
+      {!showForm ? (
+        <TouchableOpacity 
+          style={styles.addButton} 
+          onPress={() => setShowForm(true)}
+        >
+          <Text style={styles.addButtonText}>+ Add New Task</Text>
+        </TouchableOpacity>
+      ) : (
+        <AddTodoForm 
+          onSubmit={handleAddTodo} 
+          onCancel={() => setShowForm(false)} 
+        />
+      )}
+      
       <View style={styles.listContainer}>
         <FlatList
           data={todos}
@@ -45,13 +75,16 @@ export default function TodoList() {
           renderItem={({ item }) => (
             <View style={styles.item}>
               <Text style={styles.text}>{item.todo}</Text>
+              <Text style={styles.statusText}>
+                {item.completed ? "Done" : "To Do"}
+              </Text>
             </View>
           )}
         />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -96,8 +129,30 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     backgroundColor: "#f9c2ff",
     borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   text: {
     fontSize: 16,
   },
+  statusText: {
+    fontSize: 16,
+    color: "#555",
+    fontStyle: "italic",
+  },
+  addButton: {
+    backgroundColor: "blue",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: "8%",
+    marginBottom: 10,
+  },
+  addButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
+
+export default TodoList;
