@@ -1,8 +1,10 @@
 import { db, initDB } from "../store/database";
-import { todos } from "../store/schema"; 
+import { todos } from "../store/schema";
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import AddTodoForm from "./AddTodoForm";
+import { useDispatch } from 'react-redux';
+import { setTodos } from '../store/todoSlice';
 
 interface Todo {
   id: number;
@@ -14,6 +16,7 @@ const TodoList: React.FC = () => {
   const [todosList, setTodosList] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     initDB();
@@ -23,7 +26,8 @@ const TodoList: React.FC = () => {
   const fetchTodos = async () => {
     try {
       const result = await db.select().from(todos).all();
-      setTodosList(result);
+      setTodosList(result); 
+      dispatch(setTodos(result)); 
     } catch (error) {
       console.error("Error fetching todos:", error);
     } finally {
@@ -38,7 +42,7 @@ const TodoList: React.FC = () => {
         completed: data.status === "done",
       }).run();
 
-      fetchTodos();
+      fetchTodos(); 
       Alert.alert("Success", "Task added successfully!");
     } catch (error) {
       console.error("Error adding todo:", error);
@@ -70,6 +74,7 @@ const TodoList: React.FC = () => {
 };
 
 export default TodoList;
+
 
 
 

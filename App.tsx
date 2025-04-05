@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import { NavigationContainer } from '@react-navigation/native';
-import TabNavigator from './navigation/TabNavigator';
+import { Provider } from 'react-redux';
+import TabNavigator from './components/TabNavigator';
+import { store } from './store';
 
 
 export default function App() {
 
 
   return (
-    <NavigationContainer>
+    <Provider store={store}>
       <TabNavigator />
-    </NavigationContainer>
+    </Provider>
   );
 }
 

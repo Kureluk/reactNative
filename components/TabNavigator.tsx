@@ -1,25 +1,24 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, BottomTabNavigationOptions, RouteProp } from '@react-navigation/bottom-tabs';
 import TodoList from '../components/TodoList';
 import SettingsScreen from '../components/SettingsScreen';
 import { Ionicons } from '@expo/vector-icons';
-import { RouteProp } from '@react-navigation/native';
-import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
-type TabParamList = {
-  Tasks: undefined;
-  Settings: undefined;
-};
-
-const Tab = createBottomTabNavigator<TabParamList>();
+const Tab = createBottomTabNavigator(); 
 
 const TabNavigator = () => {
+  const incompleteCount = useSelector(
+    (state: RootState) => state.todo.todos.filter((t) => !t.completed).length
+  );
+
   return (
     <Tab.Navigator
       screenOptions={({
         route,
       }: {
-        route: RouteProp<TabParamList, keyof TabParamList>;
+        route: RouteProp<{ Tasks: undefined; Settings: undefined }, keyof { Tasks: undefined; Settings: undefined }>;
       }): BottomTabNavigationOptions => ({
         tabBarIcon: ({
           color,
@@ -35,6 +34,7 @@ const TabNavigator = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarBadge: route.name === 'Tasks' && incompleteCount > 0 ? incompleteCount : undefined,
       })}
     >
       <Tab.Screen name="Tasks" component={TodoList} />
