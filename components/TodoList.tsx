@@ -1,90 +1,77 @@
-import React, { useEffect, useState } from "react";
+import { db, initDB } from "../store/database";
+import { todos } from "../store/schema"; 
+import { useEffect, useState } from "react";
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import axios from "axios";
 import AddTodoForm from "./AddTodoForm";
-import { NewTodo } from "../models/task";
 
 interface Todo {
   id: number;
   todo: string;
   completed: boolean;
-  userId: number;
 }
 
 const TodoList: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todosList, setTodosList] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    axios.get<{ todos: Todo[] }>("https://dummyjson.com/todos")
-      .then(response => {
-        setTodos(response.data.todos);
-      })
-      .catch(error => {
-        console.error("Error fetching todos:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    initDB();
+    fetchTodos();
   }, []);
 
-  const handleAddTodo = (data: NewTodo) => {
-    const newTodo = {
-      id: Math.max(0, ...todos.map(t => t.id)) + 1,
-      todo: data.title,
-      completed: data.status === "done",
-      userId: 1
-    };
-    
-    setTodos([newTodo, ...todos]);
-    Alert.alert("Success", "Task added successfully!");
+  const fetchTodos = async () => {
+    try {
+      const result = await db.select().from(todos).all();
+      setTodosList(result);
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddTodo = async (data: { title: string; status: string }) => {
+    try {
+      await db.insert(todos).values({
+        todo: data.title,
+        completed: data.status === "done",
+      }).run();
+
+      fetchTodos();
+      Alert.alert("Success", "Task added successfully!");
+    } catch (error) {
+      console.error("Error adding todo:", error);
+    }
   };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
   }
 
-  const currentDate = new Date().toLocaleDateString();
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>To do list</Text>
-        <Text style={styles.dateText}>{currentDate}</Text>
-      </View>
-      
-      {!showForm ? (
-        <TouchableOpacity 
-          style={styles.addButton} 
-          onPress={() => setShowForm(true)}
-        >
-          <Text style={styles.addButtonText}>+ Add New Task</Text>
-        </TouchableOpacity>
-      ) : (
-        <AddTodoForm 
-          onSubmit={handleAddTodo} 
-          onCancel={() => setShowForm(false)} 
-        />
-      )}
-      
-      <View style={styles.listContainer}>
-        <FlatList
-          data={todos}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.text}>{item.todo}</Text>
-              <Text style={styles.statusText}>
-                {item.completed ? "Done" : "To Do"}
-              </Text>
-            </View>
-          )}
-        />
-      </View>
+      <FlatList
+        data={todosList}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text>{item.todo}</Text>
+            <Text>{item.completed ? "Done" : "To Do"}</Text>
+          </View>
+        )}
+      />
+      <TouchableOpacity onPress={() => setShowForm(!showForm)} style={styles.addButton}>
+        <Text style={styles.addButtonText}>+ Add New Task</Text>
+      </TouchableOpacity>
+      {showForm && <AddTodoForm onSubmit={handleAddTodo} onCancel={() => setShowForm(false)} />}
     </View>
   );
 };
+
+export default TodoList;
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -155,4 +142,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TodoList;

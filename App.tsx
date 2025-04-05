@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import Protocol from "./components/Protocol";
+
+import TodoList from "./components/TodoList";
 
 export default function App() {
 
 
   return (
     <View style={styles.container}>
-      <Protocol/>
+      <TodoList/>
     </View>
   );
 }
