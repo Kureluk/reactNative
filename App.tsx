@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
+import { NavigationContainer } from '@react-navigation/native';
+import TabNavigator from './navigation/TabNavigator';
 
-import TodoList from "./components/TodoList";
 
 export default function App() {
 
 
   return (
-    <View style={styles.container}>
-      <TodoList/>
-    </View>
+    <NavigationContainer>
+      <TabNavigator />
+    </NavigationContainer>
   );
 }
 
