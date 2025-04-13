@@ -5,6 +5,7 @@ import TabNavigator from './components/TabNavigator';
 import { store } from './store';
 
 
+
 export default function App() {
 
 
@@ -12,6 +13,7 @@ export default function App() {
     <Provider store={store}>
       <TabNavigator />
     </Provider>
+
   );
 }
 

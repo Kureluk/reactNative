@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
 import { Controller, useForm } from "react-hook-form";
 import { NewTodo } from "../models/task";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 
 interface AddTodoFormProps {

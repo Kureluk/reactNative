@@ -4,7 +4,10 @@ interface Todo {
   id: number;
   todo: string;
   completed: boolean;
+  deadline?: string;
+  notificationId?: string; // щоб відмінити пізніше
 }
+
 
 interface TodoState {
   todos: Todo[];
