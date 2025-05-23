@@ -3,17 +3,17 @@ import { View, Text, Button, StyleSheet } from "react-native";
 import { Provider } from 'react-redux';
 import TabNavigator from './components/TabNavigator';
 import { store } from './store';
-
+import CardDeckAnimation from "./components/CardDeckAnimation";
 
 
 export default function App() {
 
 
   return (
-    <Provider store={store}>
-      <TabNavigator />
-    </Provider>
-
+    // <Provider store={store}>
+    //   <TabNavigator />
+    // </Provider>
+    <CardDeckAnimation/>
   );
 }
 
